@@ -43,3 +43,15 @@ class Solution:
                 dic[nums[i]] = i
             else:
                 return [dic[target-nums[i]],i]
+
+
+# 方法四：哈希表+枚举
+#  leecode官方
+class Solution:
+    def twoSum(self, nums:List[int], target:int) -> List[int]:
+        dic = {}
+        for i,num in enumerate(nums):
+            if target-nums[i] not in dic:
+                dic[nums[i]] = i
+            else:
+                return [dic[target - nums[i]],i]
