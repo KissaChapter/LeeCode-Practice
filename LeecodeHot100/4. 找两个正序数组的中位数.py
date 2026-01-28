@@ -8,7 +8,7 @@ class Solution:
         nums1.sort()
         n = len(nums1)
         if n % 2 == 0:
-            # python中//为地板除法，用于得到向下取证的结果
+            # python中//为地板除法，用于得到向下取整的结果
             # 而/为真除法，得到float类型的准确结果
             # %为整除后得到余数的运算符
             mid = n//2
@@ -19,52 +19,53 @@ class Solution:
 
 
 # 方法二：力扣大佬给的解，这个算法的时间复杂度是 O(log(min(m, n)))，比 O(m+n) 好得多，执行0ms
-#
+# 使用i j在两个数组中寻找可能得中位数的位置
 class Solution:
     def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
-        # 确保 nums1 是较短的数组
         if len(nums1) > len(nums2):
-            nums1, nums2 = nums2, nums1
-        # 这里 m 一定小于 n
-        m, n = len(nums1), len(nums2)
-        imin, imax, half_len = 0, m, (m + n + 1) // 2
+            nums1,nums2 = nums2, nums1
+
+        m,n=len(nums1),len(nums2)
+        mid =(m+n+1)//2
+        imin,imax = 0,m
 
         while imin <= imax:
-            i = (imin + imax) // 2
-            j = half_len - i
+            i = (imin+imax) // 2
+            j = mid-i
 
-            # 处理边界情况
-            if i < m and nums2[j - 1] > nums1[i]:
-                # i太小，需要增大
-                imin = i + 1
-            elif i > 0 and nums1[i - 1] > nums2[j]:
-                # i太大，需要减小
+            # 当i的值太小：
+            if i<m and nums2[j-1]>nums1[i]:
+                imin = i+1
+                # 这里是i而不是 imin，是二分查找的精髓，它可以大大缩短查找中位数的时间
+            # 当i的值太大：
+            elif i>0 and nums1[i-1]>nums2[j]:
                 imax = i - 1
             else:
-                # 找到合适的分割线，处理中位数计算
-
-                # 计算左半部分最大值
-                if i == 0:
-                    max_of_left = nums2[j - 1]
-                elif j == 0:
-                    max_of_left = nums1[i - 1]
+                # 计算中位数左半部分的最大值
+                if i==0:
+                    max_left = nums2[j-1]
+                elif j==0:
+                # 绝对不可以写成elif i == m
+                    max_left = nums1[i-1]
                 else:
-                    max_of_left = max(nums1[i - 1], nums2[j - 1])
+                    max_left = max(nums1[i-1],nums2[j-1])
 
-                # 如果总数是奇数，直接返回左半部分最大值
-                if (m + n) % 2 == 1:
-                    return max_of_left
+                # 如果有奇数个元素，中位数就是中间的元素(左半部分的最大值)
+                if (m+n)%2 == 1:
+                    return max_left
 
-                # 计算右半部分最小值
-                if i == m:
-                    min_of_right = nums2[j]
+                # 如果有偶数个元素，中位数是中间两个元素的平均值
+                # 计算中间元素右边的元素 min_right
+                if i==m:
+                    min_right = nums2[j]
                 elif j == n:
-                    min_of_right = nums1[i]
+                    min_right = nums1[i]
                 else:
-                    min_of_right = min(nums1[i], nums2[j])
+                    min_right = min(nums1[i],nums2[j])
+                return (max_left + min_right)/2.0
 
-                # 如果是偶数，返回平均值
-                return (max_of_left + min_of_right) / 2.0
+
+
 # 以下是解析：
 #     首先，我们需要明确什么是中位数：对于一个有序数组，如果长度是奇数，中位数就是中间那个数；如果是偶数，中位数是中间两个数的平均值。
 #     对于两个有序数组，我们需要找到合并后的有序数组的中位数。直接合并再找中位数的时间复杂度是O(m+n)，不符合题目要求。
