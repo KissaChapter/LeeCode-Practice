@@ -11,30 +11,29 @@ class Solution:
             return 0
         return x_int
 
+
 # 示例1
 solution = Solution()
 x = solution.reverse(-817623276)
 print(x)
 
 
-# 方法二：leecode官方题解。没有使用 abs函数，模拟的是底层原理，对语言没有依赖性
+# 方法二：leecode官方题解，解决了过程中可能越界、python和其他语言底层代码不兼容的问题
 class Solution:
     def reverse(self, x: int) -> int:
         INT_MIN, INT_MAX = -2 ** 31, 2 ** 31 - 1
         rev = 0
-        while x != 0:
-            # 检查是否会溢出
-            if rev > INT_MAX // 10:
-                return 0
-            if rev < INT_MIN // 10:
-                return 0
 
-            # 处理Python的负数取余问题：
-            # 处理Python与其他语言（如C++/Java）在负数取余和除法运算上的差异
-            digit = x % 10
+        while x != 0:
+            # 例：-123 // 10 = -13，python整数除法向负无穷取整，如果不 +1 则将导致 int_min 附近的区域多了几个数，无法正确判断是否溢出
+            if rev < INT_MIN // 10 + 1 or rev > INT_MAX // 10:
+                return 0
+            digit = x % 10      # 余数
+            # Python3 的取模运算在x为负数时也会返回 [0, 9) 以内的结果，因此这里需要进行特殊判断
             if x < 0 and digit > 0:
                 digit -= 10
-            # 更新x和rev
-            x = (x - digit) // 10  # 这样处理可以正确处理负数
+
+            # 同理，Python3的整数除法在x为负数时会向下（更小的负数）取整，因此不能写成 x //= 10
+            x = (x - digit) // 10
             rev = rev * 10 + digit
         return rev
